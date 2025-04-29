@@ -325,16 +325,20 @@ const contractsSlice = createSlice({
           state.contractsByFarmer[farmerId] = state.contractsByFarmer[farmerId].filter(
             contract => contract.id !== action.payload
           );
-        });
+              });
         
-        // Remove from all activeContractsByFarmer lists
-        Object.keys(state.activeContractsByFarmer).forEach(farmerId => {
-          state.activeContractsByFarmer[farmerId] = state.activeContractsByFarmer[farmerId].filter(
-            contract => contract.id !== action.payload
-          );
-        });
-      })
-      .addCase(deleteContract.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+              // Remove from all activeContractsByFarmer lists
+              Object.keys(state.activeContractsByFarmer).forEach(farmerId => {
+                state.activeContractsByFarmer[farmerId] = state.activeContractsByFarmer[farmerId].filter(
+                  contract => contract.id !== action.payload
+                );
+              });
+            })
+            .addCase(deleteContract.rejected, (state, action) => {
+              state.loading = false;
+              state.error = action.payload;
+            });
+        },
       });
+      
+      export default contractsSlice.reducer;
