@@ -1,0 +1,68 @@
+/* Input component styles */
+.input-container {
+    margin-bottom: 1rem;
+  }
+  
+  /* Overrides for input types */
+  .form-input[type="date"],
+  .form-input[type="time"],
+  .form-input[type="datetime-local"] {
+    min-height: 38px;
+  }
+  
+  /* Placeholder styles */
+  .form-input::placeholder {
+    color: #a0aec0;
+    opacity: 1;
+  }
+  
+  /* Disabled input styles */
+  .form-input:disabled::placeholder {
+    color: #cbd5e0;
+  }
+  
+  /* Error input animation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+  }
+  
+  .form-input.error-shake {
+    animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+  
+  /* Focus styles */
+  .form-input:focus-within {
+    outline: none;
+  }
+  
+  /* Custom file input */
+  .form-input[type="file"] {
+    padding: 0.4rem;
+  }
+  
+  .form-input[type="file"]::file-selector-button {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    margin-right: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .form-input[type="file"]::file-selector-button:hover {
+    background-color: #e5e7eb;
+  }
+  
+  /* Custom checkbox and radio styles */
+  .form-input[type="checkbox"],
+  .form-input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    vertical-align: middle;
+  }

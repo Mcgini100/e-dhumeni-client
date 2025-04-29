@@ -1,0 +1,47 @@
+/* Alert Animations */
+@keyframes alertSlideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes alertSlideOut {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+  }
+  
+  .alert {
+    animation: alertSlideIn 0.3s ease forwards;
+    transition: all 0.3s ease;
+  }
+  
+  .alert.fade-out {
+    animation: alertSlideOut 0.3s ease forwards;
+  }
+  
+  /* Alert shadow enhancement */
+  .alert {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Hover effects */
+  .alert:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Button styles */
+  .alert button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+  }

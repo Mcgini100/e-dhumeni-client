@@ -1,0 +1,58 @@
+/* Modal animations */
+@keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes modalSlideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Apply animations to modal elements */
+  .fixed.inset-0.z-50 {
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  .fixed.inset-0.z-50 > div {
+    animation: modalSlideIn 0.3s ease-out;
+  }
+  
+  /* Scrollbar styling for modal content */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f7fafc;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 6px;
+  }
+  
+  /* Disable body scroll when modal is open */
+  body.modal-open {
+    overflow: hidden;
+  }
+  
+  /* Modal backdrop */
+  .fixed.inset-0.z-50 {
+    backdrop-filter: blur(2px);
+  }
