@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '@services/auth.service';
+import ProtectedRoute from '@components/auth/ProtectedRoute';
+import { USER_ROLES } from '@config/constants';
 
 // Layout
 import MainLayout from '@components/layout/MainLayout/MainLayout';
@@ -8,6 +9,8 @@ import MainLayout from '@components/layout/MainLayout/MainLayout';
 // Auth pages
 import Login from '@pages/Auth/Login';
 import ForgotPassword from '@pages/Auth/ForgotPassword';
+import ResetPassword from '@pages/Auth/ResetPassword';
+import Unauthorized from '@pages/Auth/Unauthorized';
 
 // Protected pages - lazy loaded
 const Dashboard = React.lazy(() => import('@pages/Dashboard/Dashboard'));
@@ -23,18 +26,11 @@ const RegionsList = React.lazy(() => import('@pages/Regions/RegionsList'));
 const RegionMap = React.lazy(() => import('@pages/Regions/RegionMap'));
 const RegionForm = React.lazy(() => import('@pages/Regions/RegionForm'));
 const AlertDashboard = React.lazy(() => import('@pages/Alerts/AlertDashboard'));
+const AEOList = React.lazy(() => import('@pages/AEO/AEOList'));
+const AEOForm = React.lazy(() => import('@pages/AEO/AEOForm'));
+const UserProfile = React.lazy(() => import('@pages/Profile/UserProfile'));
+const ProfileSettings = React.lazy(() => import('@pages/Profile/ProfileSettings'));
 const NotFound = React.lazy(() => import('@pages/NotFound'));
-
-/**
- * Protected Route Component
- * Redirects to login if user is not authenticated
- */
-const ProtectedRoute = ({ children }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
 
 /**
  * Routes Configuration
@@ -45,6 +41,15 @@ const routes = [
     element: <MainLayout />,
     children: [
       { path: '/', element: <Navigate to="/dashboard" replace /> },
+      
+      // Auth routes (public)
+      { path: '/login', element: <Login /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/reset-password', element: <ResetPassword /> },
+      { path: '/reset-password/:token', element: <ResetPassword /> },
+      { path: '/unauthorized', element: <Unauthorized /> },
+      
+      // Dashboard route (accessible to all authenticated users)
       { 
         path: '/dashboard', 
         element: (
@@ -54,7 +59,7 @@ const routes = [
         ) 
       },
       
-      // Farmers routes
+      // Farmers routes (accessible to all authenticated users)
       { 
         path: '/farmers', 
         element: (
@@ -74,7 +79,7 @@ const routes = [
       { 
         path: '/farmers/create', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER, USER_ROLES.AEO]}>
             <FarmerForm />
           </ProtectedRoute>
         ) 
@@ -82,7 +87,7 @@ const routes = [
       { 
         path: '/farmers/edit/:id', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER, USER_ROLES.AEO]}>
             <FarmerForm />
           </ProtectedRoute>
         ) 
@@ -108,7 +113,7 @@ const routes = [
       { 
         path: '/contracts/create', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}>
             <ContractForm />
           </ProtectedRoute>
         ) 
@@ -116,7 +121,7 @@ const routes = [
       { 
         path: '/contracts/edit/:id', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}>
             <ContractForm />
           </ProtectedRoute>
         ) 
@@ -134,7 +139,7 @@ const routes = [
       { 
         path: '/deliveries/create', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER, USER_ROLES.AEO]}>
             <DeliveryForm />
           </ProtectedRoute>
         ) 
@@ -142,7 +147,7 @@ const routes = [
       { 
         path: '/deliveries/create/:contractId', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER, USER_ROLES.AEO]}>
             <DeliveryForm />
           </ProtectedRoute>
         ) 
@@ -168,7 +173,7 @@ const routes = [
       { 
         path: '/regions/create', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}>
             <RegionForm />
           </ProtectedRoute>
         ) 
@@ -176,25 +181,65 @@ const routes = [
       { 
         path: '/regions/edit/:id', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}>
             <RegionForm />
           </ProtectedRoute>
         ) 
       },
       
-      // Alerts route
+      // AEO Management (Admin/Manager only)
+      { 
+        path: '/aeos', 
+        element: (
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}>
+            <AEOList />
+          </ProtectedRoute>
+        ) 
+      },
+      { 
+        path: '/aeos/create', 
+        element: (
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN]}>
+            <AEOForm />
+          </ProtectedRoute>
+        ) 
+      },
+      { 
+        path: '/aeos/edit/:id', 
+        element: (
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN]}>
+            <AEOForm />
+          </ProtectedRoute>
+        ) 
+      },
+      
+      // Alerts route (Manager & Admin only)
       { 
         path: '/alerts', 
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}>
             <AlertDashboard />
           </ProtectedRoute>
         ) 
       },
       
-      // Auth routes
-      { path: '/login', element: <Login /> },
-      { path: '/forgot-password', element: <ForgotPassword /> },
+      // User profile & settings (accessible to all authenticated users)
+      { 
+        path: '/profile', 
+        element: (
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        ) 
+      },
+      { 
+        path: '/settings', 
+        element: (
+          <ProtectedRoute>
+            <ProfileSettings />
+          </ProtectedRoute>
+        ) 
+      },
       
       // Catch-all
       { path: '*', element: <NotFound /> }

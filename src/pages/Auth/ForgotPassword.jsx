@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import AuthAPI from '@api/auth.api';
 import Button from '@components/common/Button/Button';
+import Input from '@components/common/Input/Input';
+import Alert from '@components/common/Alert/Alert';
+import Loader from '@components/common/Loader/Loader';
 
 // Validation schema for reset password form
 const resetPasswordSchema = Yup.object().shape({
@@ -13,33 +16,33 @@ const resetPasswordSchema = Yup.object().shape({
 });
 
 /**
- * ForgotPassword Component
- * Form for users to request a password reset
+ * Enhanced ForgotPassword Component
+ * Form for users to request a password reset with improved UX
  * @returns {JSX.Element} ForgotPassword component
  */
 const ForgotPassword = () => {
   const [requestSent, setRequestSent] = useState(false);
   const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       setError('');
-      // This would call the actual API in a real implementation
-      // await AuthAPI.requestPasswordReset(values.email);
       
-      // For demo purposes, simulate a successful request
-      setTimeout(() => {
-        setRequestSent(true);
-        setSubmitting(false);
-      }, 1000);
+      // This would call the actual API in a real implementation
+      await AuthAPI.requestPasswordReset(values.email);
+      
+      setEmail(values.email);
+      setRequestSent(true);
     } catch (err) {
-      setError(err.toString());
+      setError(err.message || 'Failed to request password reset. Please try again.');
+    } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <img
@@ -47,10 +50,10 @@ const ForgotPassword = () => {
             src="/assets/logo.svg"
             alt="e-Dhumeni Logo"
           />
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Reset your password
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             {requestSent
               ? "Check your email for reset instructions"
               : "Enter your email address and we'll send you a reset link"}
@@ -58,38 +61,43 @@ const ForgotPassword = () => {
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">{error}</h3>
-              </div>
-            </div>
-          </div>
+          <Alert
+            type="error"
+            message={error}
+            className="mb-4"
+            isClosable={true}
+            onClose={() => setError('')}
+          />
         )}
 
         {requestSent ? (
-          <div className="rounded-md bg-green-50 p-4">
-            <div className="flex">
+          <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mt-8">
+            <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg className="h-10 w-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-800">
-                  Reset request sent successfully
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Reset request sent
                 </h3>
-                <div className="mt-2 text-sm text-green-700">
-                  <p>
-                    We've sent a password reset link to your email. Please check your inbox and follow the instructions to reset your password.
-                  </p>
-                </div>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  We've sent a password reset link to <strong>{email}</strong>. Please check your inbox and follow the instructions to reset your password.
+                </p>
+                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  If you don't see the email, check your spam folder or try again.
+                </p>
               </div>
+            </div>
+            <div className="mt-6">
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={() => setRequestSent(false)}
+              >
+                Try again with a different email
+              </Button>
             </div>
           </div>
         ) : (
@@ -98,35 +106,47 @@ const ForgotPassword = () => {
             validationSchema={resetPasswordSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
+            {({ isSubmitting, errors, touched, values, handleChange, handleBlur }) => (
               <Form className="mt-8 space-y-6">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email address
-                  </label>
-                  <div className="mt-1">
-                    <Field
-                      id="email"
+                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                  <div className="space-y-4">
+                    <Input
+                      label="Email address"
                       name="email"
                       type="email"
                       autoComplete="email"
                       required
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                       placeholder="Enter your email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.email && errors.email}
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      }
                     />
-                    <ErrorMessage name="email" component="div" className="text-red-500 text-xs mt-1" />
                   </div>
-                </div>
 
-                <div>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    fullWidth
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Sending...' : 'Send Reset Link'}
-                  </Button>
+                  <div className="mt-6">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      fullWidth
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center justify-center">
+                          <Loader size="sm" color="white" type="spinner" />
+                          <span className="ml-2">Sending...</span>
+                        </span>
+                      ) : (
+                        'Send Reset Link'
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </Form>
             )}
@@ -134,9 +154,16 @@ const ForgotPassword = () => {
         )}
 
         <div className="text-center">
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
             Back to login
           </Link>
+        </div>
+        
+        {/* Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            &copy; {new Date().getFullYear()} e-Dhumeni. All rights reserved.
+          </p>
         </div>
       </div>
     </div>

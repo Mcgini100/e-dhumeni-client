@@ -1,7 +1,8 @@
 import apiClient from './apiClient';
+import { handleApiError } from '../utils/errorHandlers';
 
 /**
- * Authentication API service
+ * Enhanced Authentication API service
  */
 const AuthAPI = {
   /**
@@ -15,7 +16,21 @@ const AuthAPI = {
       const response = await apiClient.post('/auth/login', { username, password });
       return response.data;
     } catch (error) {
-      throw error.response?.data?.message || 'Login failed. Please check your credentials.';
+      throw handleApiError(error, 'Login', 'Invalid username or password');
+    }
+  },
+
+  /**
+   * Refresh authentication token
+   * @param {string} refreshToken - Refresh token
+   * @returns {Promise} Promise with new token data
+   */
+  refreshToken: async (refreshToken) => {
+    try {
+      const response = await apiClient.post('/auth/refresh-token', { refreshToken });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error, 'Token Refresh', 'Failed to refresh authentication token');
     }
   },
 
@@ -28,7 +43,21 @@ const AuthAPI = {
       const response = await apiClient.get('/auth/me');
       return response.data;
     } catch (error) {
-      throw error.response?.data?.message || 'Failed to get user profile.';
+      throw handleApiError(error, 'Get User Profile', 'Failed to fetch user profile');
+    }
+  },
+
+  /**
+   * Update user profile
+   * @param {Object} profileData - Updated profile data
+   * @returns {Promise} Promise with updated user data
+   */
+  updateProfile: async (profileData) => {
+    try {
+      const response = await apiClient.put('/auth/profile', profileData);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error, 'Update Profile', 'Failed to update user profile');
     }
   },
 
@@ -46,7 +75,7 @@ const AuthAPI = {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data?.message || 'Failed to change password.';
+      throw handleApiError(error, 'Change Password', 'Failed to change password');
     }
   },
 
@@ -60,7 +89,7 @@ const AuthAPI = {
       const response = await apiClient.post('/auth/request-reset', { email });
       return response.data;
     } catch (error) {
-      throw error.response?.data?.message || 'Failed to request password reset.';
+      throw handleApiError(error, 'Password Reset Request', 'Failed to request password reset');
     }
   },
 
@@ -78,9 +107,36 @@ const AuthAPI = {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data?.message || 'Failed to reset password.';
+      throw handleApiError(error, 'Password Reset', 'Failed to reset password');
     }
   },
+
+  /**
+   * Verify password reset token
+   * @param {string} token - Reset token to verify
+   * @returns {Promise} Promise with token validity
+   */
+  verifyResetToken: async (token) => {
+    try {
+      const response = await apiClient.get(`/auth/verify-reset-token/${token}`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error, 'Token Verification', 'Invalid or expired reset token');
+    }
+  },
+
+  /**
+   * Logout user (if using server-side logout)
+   * @returns {Promise} Promise with logout confirmation
+   */
+  logout: async () => {
+    try {
+      const response = await apiClient.post('/auth/logout');
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error, 'Logout', 'Failed to logout properly');
+    }
+  }
 };
 
 export default AuthAPI;
