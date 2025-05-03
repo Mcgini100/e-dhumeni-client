@@ -92,7 +92,7 @@ const Login = () => {
           validationSchema={loginSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting, errors, touched }) => (
+          {({ isSubmitting, errors, touched, handleChange, handleBlur, values }) => (
             <Form className="mt-8 space-y-6">
               <div className="space-y-4">
                 <div>
@@ -103,6 +103,9 @@ const Login = () => {
                     autoComplete="username"
                     required
                     placeholder="Enter your username"
+                    value={values.username}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                     error={touched.username && errors.username}
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
@@ -120,6 +123,9 @@ const Login = () => {
                     autoComplete="current-password"
                     required
                     placeholder="Enter your password"
+                    value={values.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                     error={touched.password && errors.password}
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
